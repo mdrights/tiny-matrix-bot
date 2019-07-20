@@ -60,7 +60,8 @@ class TinyMatrixtBot():
     def connect(self):
         try:
             logger.info("connecting to {}".format(self.base_url))
-            self.client = MatrixClient(self.base_url, token=self.token)
+            self.client = MatrixClient(self.base_url, token=self.token, user_id="@wahaha:matrix.allmende.io")
+            #self.client = MatrixClient(self.base_url, token=self.token)
             logger.info("connection established")
         except Exception:
             logger.warning(
@@ -139,10 +140,16 @@ class TinyMatrixtBot():
         if event["content"]["msgtype"] != "m.text":
             return
         args = event["content"]["body"].strip()
+
+        print(args)
+
         for script in self.scripts:
             if not re.search(script["regex"], args, re.IGNORECASE):
+                logger.debug("User input is invalid")
                 continue
-            self.run_script(room, event, script, args)
+            else:
+                real_args = ' '.join(args.split(' ')[1:])
+                self.run_script(room, event, script, real_args)
 
     def run_script(self, room, event, script, args):
         script["env"]["__room_id"] = event["room_id"]
