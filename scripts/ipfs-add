@@ -1,0 +1,75 @@
+#!/bin/bash
+
+regex='^!?ipfs-add( .*)?$'
+
+if [ -n "$CONFIG" ]
+then
+    echo $regex
+    exit 0
+fi
+
+URL="$1"
+URL_FILE="${URL##*/}"
+TMP=/tmp/csobot-ipfs/
+mkdir -p $TMP
+
+echo $URL
+
+IPFS_GW="
+https://ipfs.sloppyta.co/ipfs
+https://d26g9c7mfuzstv.cloudfront.net/ipfs
+"
+
+# Find out ipfs binary.
+IPFS=$(which ipfs 2>/dev/null)
+if [[ -z $IPFS ]]; then
+	IPFS=/home/user/go-ipfs/ipfs
+fi
+
+CURL=$(which curl 2>/dev/null)
+if [[ -z $CURL ]]; then
+	echo "Oops, could not find cURL tool!"
+	exit 1
+fi
+	
+# Check if ipfs is running.
+if ! (ps -ef |grep go-ipfs/ipfs |grep -v grep >/dev/null); then
+	($IPFS daemon) &
+	sleep 5
+fi
+
+# Request the url.
+echo ">> Downloading you webpage..."
+cd $TMP
+$CURL -L -O "$URL" 2>/dev/null || ret=1
+cd - >/dev/null
+sleep 1
+
+# IPFS add and pin!
+if [[ $ret -eq 0 ]]; then
+	echo ">> Adding and pinning it to IPFS..."
+	FILE_HASH=$($IPFS add $TMP/$URL_FILE 2>/dev/null |head -n1 |awk '{ print $2 }')
+	sleep 1
+	$IPFS pin add $FILE_HASH || ret_final=1
+else
+	echo "Oops, FAIL to download the webpage you request!"
+	exit 1
+fi
+
+# Return the hash along with the gateway urls.
+if [[ $ret_final -eq 0 ]]; then
+	echo -e "\nCongrats! The IPFS addresses of the webpage you request are:"
+	for gw in $IPFS_GW; do
+		echo "${gw}/$FILE_HASH"
+	done
+	exit
+else
+	echo "Oops, FAIL to pin the webpage you request!"
+	exit 1
+fi
+
+	
+
+
+
+

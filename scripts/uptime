@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+regex='^!?uptime( .*)?$'
+
+if [ -n "$CONFIG" ]
+then
+    echo $regex
+    exit 0
+fi
+
+
+UPT=$(uptime)
+echo "CSObot Uptime: "$UPT
+
+#echo "first arg: $1"
+#echo "second arg: $2"
