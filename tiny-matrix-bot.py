@@ -173,6 +173,8 @@ class TinyMatrixtBot():
             universal_newlines=True
         )
         output = run.communicate()[0].strip()
+        print(output)
+
         if run.returncode != 0:
             logger.debug("script exit {}".format(run.returncode))
             return

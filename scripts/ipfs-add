@@ -12,8 +12,10 @@ URL="$1"
 URL_FILE="${URL##*/}"
 TMP=/tmp/csobot-ipfs/
 mkdir -p $TMP
-
-echo $URL
+ret=0
+ret_final=0
+HOME=/home/user
+PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
 
 IPFS_GW="
 https://ipfs.sloppyta.co/ipfs
@@ -21,22 +23,22 @@ https://d26g9c7mfuzstv.cloudfront.net/ipfs
 "
 
 # Find out ipfs binary.
-IPFS=$(which ipfs 2>/dev/null)
-if [[ -z $IPFS ]]; then
-	IPFS=/home/user/go-ipfs/ipfs
-fi
-
-CURL=$(which curl 2>/dev/null)
-if [[ -z $CURL ]]; then
-	echo "Oops, could not find cURL tool!"
-	exit 1
-fi
+#IPFS=$(/usr/bin/which ipfs 2>/dev/null)
+#if [[ -z $IPFS ]]; then
+	IPFS=$HOME/go-ipfs/ipfs
+#fi
+#
+CURL=$(/usr/bin/which curl 2>/dev/null)
+#if [[ -z $CURL ]]; then
+#	echo "Oops, could not find cURL tool!"
+#	exit 1
+#fi
 	
 # Check if ipfs is running.
-if ! (ps -ef |grep go-ipfs/ipfs |grep -v grep >/dev/null); then
-	($IPFS daemon) &
-	sleep 5
-fi
+#if ! (ps -ef |grep go-ipfs/ipfs |grep -v grep >/dev/null); then
+#	($IPFS daemon) &
+#	sleep 5
+#fi
 
 # Request the url.
 echo ">> Downloading you webpage..."
@@ -48,12 +50,18 @@ sleep 1
 # IPFS add and pin!
 if [[ $ret -eq 0 ]]; then
 	echo ">> Adding and pinning it to IPFS..."
-	FILE_HASH=$($IPFS add $TMP/$URL_FILE 2>/dev/null |head -n1 |awk '{ print $2 }')
+	#FILE_HASH=$($IPFS add $TMP/$URL_FILE  | /usr/bin/head -n1 | /usr/bin/awk '{ print $2 }')
+	#/home/user/go-ipfs/ipfs add $TMP/$URL_FILE  | /usr/bin/head -n1 | /usr/bin/awk '{ print $2 }' > $TMP/ipfs-hash 2>&1
+	/home/user/go-ipfs/ipfs id > $TMP/ipfs-hash 2>&1
+	#echo "$IPFS add $TMP/$URL_FILE 2>/dev/null |head -n1 |awk '{ print \$2 }')"
+	FILE_HASH=$(cat $TMP/ipfs-hash)
+	echo "Hash: $FILE_HASH"
 	sleep 1
-	$IPFS pin add $FILE_HASH || ret_final=1
+	ret_pin=$($IPFS pin add $FILE_HASH) || ret_final=1
+	echo "$IPFS pin add $FILE_HASH"
 else
 	echo "Oops, FAIL to download the webpage you request!"
-	exit 1
+	exit
 fi
 
 # Return the hash along with the gateway urls.
@@ -65,11 +73,6 @@ if [[ $ret_final -eq 0 ]]; then
 	exit
 else
 	echo "Oops, FAIL to pin the webpage you request!"
-	exit 1
+	exit
 fi
-
-	
-
-
-
 
