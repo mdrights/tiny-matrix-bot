@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# Modified: MDrights
+# Changelog:
+# 2019.07.21    improved as to parse and pass arguments for scripts it exec.
+
 import os
 import re
 import sys
@@ -60,8 +64,7 @@ class TinyMatrixtBot():
     def connect(self):
         try:
             logger.info("connecting to {}".format(self.base_url))
-            self.client = MatrixClient(self.base_url, token=self.token, user_id="@wahaha:matrix.allmende.io")
-            #self.client = MatrixClient(self.base_url, token=self.token)
+            self.client = MatrixClient(self.base_url, token=self.token)
             logger.info("connection established")
         except Exception:
             logger.warning(
