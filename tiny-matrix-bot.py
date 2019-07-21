@@ -168,7 +168,6 @@ class TinyMatrixtBot():
         logger.debug("script run {}".format([script["name"], args]))
         run = subprocess.Popen(
             [script["path"], args],
-            env=script["env"],
             stdout=subprocess.PIPE,
             universal_newlines=True
         )

@@ -50,15 +50,11 @@ sleep 1
 # IPFS add and pin!
 if [[ $ret -eq 0 ]]; then
 	echo ">> Adding and pinning it to IPFS..."
-	#FILE_HASH=$($IPFS add $TMP/$URL_FILE  | /usr/bin/head -n1 | /usr/bin/awk '{ print $2 }')
-	#/home/user/go-ipfs/ipfs add $TMP/$URL_FILE  | /usr/bin/head -n1 | /usr/bin/awk '{ print $2 }' > $TMP/ipfs-hash 2>&1
-	/home/user/go-ipfs/ipfs id > $TMP/ipfs-hash 2>&1
-	#echo "$IPFS add $TMP/$URL_FILE 2>/dev/null |head -n1 |awk '{ print \$2 }')"
-	FILE_HASH=$(cat $TMP/ipfs-hash)
+	FILE_HASH=$($IPFS add $TMP/$URL_FILE  | /usr/bin/head -n1 | /usr/bin/awk '{ print $2 }')
 	echo "Hash: $FILE_HASH"
 	sleep 1
-	ret_pin=$($IPFS pin add $FILE_HASH) || ret_final=1
 	echo "$IPFS pin add $FILE_HASH"
+	ret_pin=$($IPFS pin add $FILE_HASH) || ret_final=1
 else
 	echo "Oops, FAIL to download the webpage you request!"
 	exit
