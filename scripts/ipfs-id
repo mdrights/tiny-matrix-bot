@@ -17,7 +17,9 @@ if [[ -z $IPFS ]]; then
 	IPFS=$HOME/go-ipfs/ipfs
 fi
 
-id=$(sh -c "$IPFS id")
+JQ=$(/usr/bin/which jq 2>/dev/null)
+
+id=$($IPFS id | $JQ '.ID')
 
 echo "ipfs id: $id"
 
