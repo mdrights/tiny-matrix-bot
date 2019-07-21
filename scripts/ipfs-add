@@ -25,6 +25,12 @@ https://cloudflare-ipfs.com/ipfs
 https://ipfs.sloppyta.co/ipfs
 "
 
+# Specify a file name if the url is not ended with a filename.
+if [[ -z $URL_FILE ]]; then
+	URL=${URL%?}
+	URL_FILE="${URL##*/}"
+fi
+
 # Find out ipfs binary.
 IPFS=$(/usr/bin/which ipfs 2>/dev/null)
 if [[ -z $IPFS ]]; then
@@ -39,15 +45,16 @@ fi
 	
 # Check if ipfs is running.
 if ! (ps -ef |grep go-ipfs/ipfs |grep -v grep >/dev/null); then
-	($IPFS daemon) &
-	sleep 5
+	#($IPFS daemon) &
+	#sleep 15
+	echo "No ipfs daemon is running. Please start it."
+	exit
 fi
 
 # Request the url.
-echo ">> Downloading you webpage..."
-cd $TMP
-$CURL -L -O "$URL" 2>/dev/null || ret=1
-cd - >/dev/null
+echo ">> Downloading your webpage, please wait..."
+#$CURL -L -o $TMP/$URL_FILE "$URL" 2>/dev/null || ret=1
+$CURL -L -o $TMP/$URL_FILE "$URL"  || ret=1
 sleep 1
 
 # IPFS add and pin!
