@@ -144,7 +144,7 @@ class TinyMatrixtBot():
             return
         args = event["content"]["body"].strip()
 
-        print(args)
+        #print(args)
 
         for script in self.scripts:
             if not re.search(script["regex"], args, re.IGNORECASE):
@@ -175,7 +175,7 @@ class TinyMatrixtBot():
             universal_newlines=True
         )
         output = run.communicate()[0].strip()
-        print(output)
+        #print(output)
 
         if run.returncode != 0:
             logger.debug("script exit {}".format(run.returncode))
