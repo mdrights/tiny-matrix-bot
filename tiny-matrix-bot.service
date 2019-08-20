@@ -2,7 +2,7 @@
 Description=tiny-matrix-bot
 
 [Service]
-User=tiny-matrix-bot
+User=user
 Group=users
 Environment=PYTHONUNBUFFERED=1
 ExecStart=/home/tiny-matrix-bot/tiny-matrix-bot/tiny-matrix-bot.py
