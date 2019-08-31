@@ -11,19 +11,16 @@ fi
 URL="$1"
 URL_FILE="${URL##*/}"
 TMP=/tmp/csobot-ipfs
+RES_FILE="/tmp/ipfs-gateway-result.log"
 mkdir -p $TMP
 ret=0
 ret_final=0
 HOME=/home/user
 PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
 
-IPFS_GW="
-https://ipfs.eternum.io/ipfs
-https://gateway.ipfs.io/ipfs
-https://ipfs.io/ipfs
-https://cloudflare-ipfs.com/ipfs
-https://ipfs.sloppyta.co/ipfs
-"
+IPFS_GW=$(cat $RES_FILE 2>/dev/null |tail -n5)
+#[[ -z $IPFS_GW ]] && echo "Oops, the gateway list is blank!" && exit
+[[ -z $IPFS_GW ]] && IPFS_GW="https://ipfs.eternum.io"
 
 # Specify a file name if the url is not ended with a filename.
 if [[ -z $URL_FILE ]]; then
@@ -75,7 +72,7 @@ if [[ $ret_final -eq 0 ]]; then
 	echo "==============================="
 	echo -e "Congrats! The IPFS addresses of the webpage you request are:"
 	for gw in $IPFS_GW; do
-		echo "${gw}/$FILE_HASH"
+		echo "${gw}/ipfs/$FILE_HASH"
 	done
 	echo "==============================="
 	exit
