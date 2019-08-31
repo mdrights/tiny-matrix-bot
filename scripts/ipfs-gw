@@ -1,0 +1,15 @@
+#!/bin/sh -e
+
+regex='^!?ipfs-gw( .*)?$'
+
+if [ -n "$CONFIG" ]
+then
+    echo $regex
+    exit 0
+fi
+
+RES_FILE="/tmp/ipfs-gateway-result.log"
+echo "==== Today's IPFS gateway: ===="
+cat $RES_FILE
+
+exit
