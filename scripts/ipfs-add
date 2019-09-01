@@ -18,7 +18,8 @@ ret_final=0
 HOME=/home/user
 PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
 
-IPFS_GW=$(cat $RES_FILE 2>/dev/null |tail -n5)
+#IPFS_GW=$(cat $RES_FILE 2>/dev/null |tail -n5)
+IPFS_GW=$(cat $RES_FILE 2>/dev/null)
 #[[ -z $IPFS_GW ]] && echo "Oops, the gateway list is blank!" && exit
 [[ -z $IPFS_GW ]] && IPFS_GW="https://ipfs.eternum.io"
 
