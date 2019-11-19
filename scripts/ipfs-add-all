@@ -1,0 +1,95 @@
+#!/bin/bash
+# AUTHOR MDrights
+# UPDATE 2019-11-19
+
+regex='^!?ipfs-add-all( .*)?$'
+
+if [ -n "$CONFIG" ]
+then
+    echo $regex
+    exit 0
+fi
+
+URL="$1"
+
+TMP=/tmp/csobot-ipfs
+RES_FILE="/tmp/ipfs-gateway-result.log"
+mkdir -p $TMP
+ret=0
+ret_final=0
+HOME=/home/user
+PATH=$HOME/bin/go-ipfs:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+
+IPFS_GW=$(cat $RES_FILE 2>/dev/null)
+#[[ -z $IPFS_GW ]] && echo "Oops, the gateway list is blank!" && exit
+[[ -z $IPFS_GW ]] && IPFS_GW="https://ipfs.eternum.io"
+
+# Parse the url inputted.
+URL_ROOT=$(awk -F'/' '{ print $3 }' <<<$URL)
+URL_REST=$(awk -F'/' 'BEGIN{ORS="/"} { for(i=4;i<=NF;i++) { print $i } }' <<<$URL)
+URL_REST=${URL_REST::-1}
+
+if ! [[ ${URL_REST##*.} =~ 'htm' ]]; then
+	URL_REST="${URL_REST}.html"
+fi
+
+echo $URL_ROOT
+echo $URL_REST
+
+
+# Find out ipfs binary.
+IPFS=$(/usr/bin/which ipfs 2>/dev/null)
+if [[ -z $IPFS ]]; then
+	IPFS=$HOME/bin/go-ipfs/ipfs
+fi
+
+WGET=$(/usr/bin/which wget 2>/dev/null)
+if [[ -z $WGET ]]; then
+	echo "Oops, could not find tool: wget!"
+	exit 1
+fi
+	
+# Check if ipfs is running.
+if ! (ps aux |grep go-ipfs/ipfs |grep -v grep >/dev/null); then
+	#($IPFS daemon) &
+	#sleep 15
+	echo "No ipfs daemon is running. Please start it."
+	exit
+fi
+
+# Request the url.
+echo ">> Downloaded your webpage ..."
+#$CURL -L -o $TMP/$URL_FILE "$URL"  || ret=1
+$WGET  --timestamping --no-remove-listing --execute robots=off --page-requisites --wait 2 --adjust-extension -U Mozilla --no-parent --convert-links --directory-prefix=$TMP "$URL" #|| ret=1
+sleep 1
+
+# IPFS add and pin!
+if [[ $ret -eq 0 ]] || [[ -f $TMP/$URL_ROOT/$URL_REST ]]; then
+	echo ">> Adding and pinning it to IPFS..."
+	#echo "$IPFS add -r -q $TMP/$URL_ROOT | /usr/bin/tail -n1 "
+	FILE_HASH=$($IPFS add -r -q $TMP/$URL_ROOT | /usr/bin/tail -n1) 
+	#echo "Hash: $FILE_HASH"
+
+	sleep 1
+
+	#echo "$IPFS pin add $FILE_HASH"
+	ret_pin=$($IPFS pin add $FILE_HASH) || ret_final=1
+else
+	echo "Oops, FAIL to download the webpage you request!"
+	exit
+fi
+
+# Return the hash along with the gateway urls.
+if [[ $ret_final -eq 0 ]]; then
+	echo "==============================="
+	echo -e "Congrats! The IPFS addresses of the webpage you request are:"
+	for gw in $IPFS_GW; do
+		echo "${gw}/ipfs/${FILE_HASH}/${URL_REST}"
+	done
+	echo "==============================="
+	exit
+else
+	echo "Oops, FAIL to pin the webpage you request!"
+	exit
+fi
+
