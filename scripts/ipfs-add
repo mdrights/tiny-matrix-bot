@@ -32,7 +32,7 @@ fi
 # Find out ipfs binary.
 IPFS=$(/usr/bin/which ipfs 2>/dev/null)
 if [[ -z $IPFS ]]; then
-	IPFS=$HOME/go-ipfs/ipfs
+	IPFS=$HOME/bin/go-ipfs/ipfs
 fi
 
 CURL=$(/usr/bin/which curl 2>/dev/null)
@@ -50,8 +50,7 @@ if ! (ps -ef |grep go-ipfs/ipfs |grep -v grep >/dev/null); then
 fi
 
 # Request the url.
-echo ">> Downloading your webpage, please wait..."
-#$CURL -L -o $TMP/$URL_FILE "$URL" 2>/dev/null || ret=1
+echo ">> Downloading your webpage ..."
 $CURL -L -o $TMP/$URL_FILE "$URL"  || ret=1
 sleep 1
 
