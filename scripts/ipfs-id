@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 regex='^!?ipfs-id( .*)?$'
 
@@ -9,7 +9,7 @@ then
 fi
 
 HOME=/home/user
-PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+PATH=$HOME/bin/go-ipfs:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
 
 # Find out ipfs binary.
 IPFS=$(/usr/bin/which ipfs 2>/dev/null)
