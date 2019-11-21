@@ -8,7 +8,10 @@ then
     exit 0
 fi
 
-RES_FILE="/tmp/ipfs-gateway-result.log"
+SELF_PATH=$(dirname $0)
+RES_FILE="$SELF_PATH/../../csobot/ipfs-gateway-result.log"
+[[ -f $RES_FILE ]] || echo "Oops, the list is not found."
+
 echo "==== Today's IPFS gateway: ===="
 cat $RES_FILE
 
