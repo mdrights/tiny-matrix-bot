@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+regex='^!?ipfs-id( .*)?$'
+
+if [ -n "$CONFIG" ]
+then
+    echo $regex
+    exit 0
+fi
+
+HOME=/home/user
+PATH=$HOME/bin/go-ipfs:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin
+
+# Find out ipfs binary.
+IPFS=$(/usr/bin/which ipfs 2>/dev/null)
+if [[ -z $IPFS ]]; then
+	IPFS=$HOME/go-ipfs/ipfs
+fi
+
+JQ=$(/usr/bin/which jq 2>/dev/null)
+
+id=$($IPFS id | $JQ '.ID')
+
+echo "ipfs id: $id"
+
+exit
