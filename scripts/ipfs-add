@@ -44,7 +44,7 @@ if [[ -z $CURL ]]; then
 fi
 	
 # Check if ipfs is running.
-if ! (ps -ef |grep go-ipfs/ipfs |grep -v grep >/dev/null); then
+if ! (ps aux |grep go-ipfs/ipfs |grep -v grep >/dev/null); then
 	#($IPFS daemon) &
 	#sleep 15
 	echo "No ipfs daemon is running. Please start it."
