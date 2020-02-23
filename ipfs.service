@@ -10,6 +10,7 @@ ExecStart=/opt/go-ipfs/ipfs daemon --enable-namesys-pubsub
 ExecStop=/bin/kill -9 $MAINPID
 Restart=on-failure
 RestartSec=30
+LimitNOFILE=10240
 
 [Install]
 WantedBy=multi-user.target
